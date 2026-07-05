@@ -1,7 +1,7 @@
 name: Run Steam with Web Link
 
 on:
-  workflow_dispatch: # Allows you to manually trigger the runner via the Actions tab
+  workflow_dispatch: 
 
 jobs:
   launch-steam:
@@ -13,15 +13,13 @@ jobs:
 
       - name: Start Headless Steam Container
         run: |
-          # Docker is already pre-installed by GitHub, so we just run the container directly
           sudo docker run -d \
             --name steam-browser \
             -p 6080:8080 \
-            ghcr.io/steam-headless/docker-steam-headless:latest
+            selkies/steam-headless:latest
 
       - name: Generate and Serve Cloudflare Web Link
         run: |
-          # Download the official Cloudflare tunnel binary cleanly
           wget -q https://github.com
           sudo dpkg -i cloudflared-linux-amd64.deb
           
@@ -30,5 +28,4 @@ jobs:
           echo " GENERATING TRYSYSTEM TUNNEL URL BELOW... "
           echo "================================================================"
           
-          # Spin up the tunnel proxy to route local port 6080 out to the public web
           cloudflared tunnel --url http://localhost:6080
