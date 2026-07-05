@@ -1,0 +1,30 @@
+name: Run Headless Steam Cloud
+
+on:
+  workflow_dispatch: # Allows you to manually click a button to start Steam
+
+jobs:
+  launch-steam:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Start Headless Steam Container
+        run: |
+          sudo apt update
+          sudo apt install -y docker.io
+          
+          # Run the container backgrounded
+          sudo docker run -d \
+            --name steam-browser \
+            -p 6080:8080 \
+            ghcr.io/steam-headless/docker-steam-headless:latest
+
+      - name: Keep Runner Alive
+        run: |
+          echo "Steam container is running!"
+          echo "The GitHub Action runner will stay active for up to 6 hours or until stopped."
+          # Keeps the GitHub machine awake so the container doesn't instantly close
+          sleep 21600 
