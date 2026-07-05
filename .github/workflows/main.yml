@@ -20,12 +20,14 @@ jobs:
 
       - name: Generate and Serve Cloudflare Web Link
         run: |
-          wget -q https://github.com
-          sudo dpkg -i cloudflared-linux-amd64.deb
+          # Use curl with a short direct download URL to prevent line breaks
+          sudo curl -L -o /usr/local/bin/cloudflared https://github.com
+          sudo chmod +x /usr/local/bin/cloudflared
           
           echo "================================================================"
           echo " SYSTEM STATUS: STEAM IS RUNNING IN BACKGROUND "
           echo " GENERATING TRYSYSTEM TUNNEL URL BELOW... "
           echo "================================================================"
           
+          # Start the tunnel proxy to route local port 6080 out to the public web
           cloudflared tunnel --url http://localhost:6080
