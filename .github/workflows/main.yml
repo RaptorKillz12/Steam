@@ -1,30 +1,26 @@
-name: Run Headless Steam Cloud
+name: Run Steam with Web Link
 
 on:
-  workflow_dispatch: # Allows you to manually click a button to start Steam
+  workflow_dispatch:
 
 jobs:
   launch-steam:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Start Headless Steam Container
+      - name: Start Headless Steam
         run: |
-          sudo apt update
-          sudo apt install -y docker.io
+          sudo apt update && sudo apt install -y docker.io
+          sudo docker run -d --name steam-browser -p 6080:8080 ghcr.io/steam-headless/docker-steam-headless:latest
+
+      - name: Create Public Web Link
+        run: |
+          # Download Cloudflare tunnel tool
+          wget https://github.com
+          sudo dpkg -i cloudflared-linux-amd64.deb
           
-          # Run the container backgrounded
-          sudo docker run -d \
-            --name steam-browser \
-            -p 6080:8080 \
-            ghcr.io/steam-headless/docker-steam-headless:latest
-
-      - name: Keep Runner Alive
-        run: |
-          echo "Steam container is running!"
-          echo "The GitHub Action runner will stay active for up to 6 hours or until stopped."
-          # Keeps the GitHub machine awake so the container doesn't instantly close
-          sleep 21600 
+          echo "=========================================================="
+          echo "CLICK THE LINK BELOW TO OPEN STEAM IN YOUR BROWSER:"
+          echo "=========================================================="
+          # Start the tunnel and print the generated URL
+          cloudflared tunnel --url http://localhost:6080
