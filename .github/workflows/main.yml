@@ -1,7 +1,7 @@
 name: Run Steam with Web Link
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   launch-steam:
@@ -16,7 +16,7 @@ jobs:
           sudo docker run -d \
             --name steam-browser \
             -p 6080:8080 \
-            selkies/steam-headless:latest
+            josh5/steam-headless:latest
 
       - name: Generate and Serve Cloudflare Web Link
         run: |
