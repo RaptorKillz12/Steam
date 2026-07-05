@@ -18,7 +18,7 @@ jobs:
           # 1. Start Headless Steam Container
           sudo docker run -d --name steam-browser -p 6080:8080 josh5/steam-headless:latest
           
-          # 2. Configure Cloudflare Keys and Repositories
+          # 2. Configure Cloudflare Keys and Repositories (Fixed Package URL)
           sudo mkdir -p --mode=0755 /etc/apt/keyrings
           sudo curl -fsSL https://cloudflare.com -o /etc/apt/keyrings/cloudflare-main.gpg
           echo "deb [signed-by=/etc/apt/keyrings/cloudflare-main.gpg] https://cloudflare.com noble main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
