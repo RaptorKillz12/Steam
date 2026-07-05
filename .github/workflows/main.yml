@@ -12,14 +12,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Start Headless Steam Container
-        env:
-          DEBIAN_FRONTEND: noninteractive
         run: |
-          # Use apt-get and quiet flags to bypass the stable CLI interface warning
-          sudo apt-get update -y -q
-          sudo apt-get install -y -q docker.io
-          
-          # Deploy the isolated Steam container in the background
+          # Docker is already pre-installed by GitHub, so we just run the container directly
           sudo docker run -d \
             --name steam-browser \
             -p 6080:8080 \
@@ -28,4 +22,13 @@ jobs:
       - name: Generate and Serve Cloudflare Web Link
         run: |
           # Download the official Cloudflare tunnel binary cleanly
-          wget -q 
+          wget -q https://github.com
+          sudo dpkg -i cloudflared-linux-amd64.deb
+          
+          echo "================================================================"
+          echo " SYSTEM STATUS: STEAM IS RUNNING IN BACKGROUND "
+          echo " GENERATING TRYSYSTEM TUNNEL URL BELOW... "
+          echo "================================================================"
+          
+          # Spin up the tunnel proxy to route local port 6080 out to the public web
+          cloudflared tunnel --url http://localhost:6080
