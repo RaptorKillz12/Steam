@@ -1,26 +1,31 @@
 name: Run Steam with Web Link
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Allows you to manually trigger the runner via the Actions tab
 
 jobs:
   launch-steam:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Start Headless Steam
-        run: |
-          sudo apt update && sudo apt install -y docker.io
-          sudo docker run -d --name steam-browser -p 6080:8080 ghcr.io/steam-headless/docker-steam-headless:latest
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Create Public Web Link
+      - name: Start Headless Steam Container
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          # Download Cloudflare tunnel tool
-          wget https://github.com
-          sudo dpkg -i cloudflared-linux-amd64.deb
+          # Use apt-get and quiet flags to bypass the stable CLI interface warning
+          sudo apt-get update -y -q
+          sudo apt-get install -y -q docker.io
           
-          echo "=========================================================="
-          echo "CLICK THE LINK BELOW TO OPEN STEAM IN YOUR BROWSER:"
-          echo "=========================================================="
-          # Start the tunnel and print the generated URL
-          cloudflared tunnel --url http://localhost:6080
+          # Deploy the isolated Steam container in the background
+          sudo docker run -d \
+            --name steam-browser \
+            -p 6080:8080 \
+            ghcr.io/steam-headless/docker-steam-headless:latest
+
+      - name: Generate and Serve Cloudflare Web Link
+        run: |
+          # Download the official Cloudflare tunnel binary cleanly
+          wget -q 
