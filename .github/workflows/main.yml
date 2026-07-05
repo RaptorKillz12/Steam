@@ -11,25 +11,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Start Headless Steam Container
+      - name: Run Everything Combined
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo docker run -d \
-            --name steam-browser \
-            -p 6080:8080 \
-            josh5/steam-headless:latest
-
-      - name: Download Cloudflare Tool
-        run: >-
-          sudo curl -L -o /usr/local/bin/cloudflared
-          https://github.com
-
-      - name: Generate and Serve Cloudflare Web Link
-        run: |
-          sudo chmod +x /usr/local/bin/cloudflared
+          # 1. Start Headless Steam Container
+          sudo docker run -d --name steam-browser -p 6080:8080 josh5/steam-headless:latest
           
+          # 2. Configure Cloudflare Keys and Repositories
+          sudo mkdir -p --mode=0755 /etc/apt/keyrings
+          sudo curl -fsSL https://cloudflare.com -o /etc/apt/keyrings/cloudflare-main.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/cloudflare-main.gpg] https://cloudflare.com noble main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          
+          # 3. Update and Install Cloudflared
+          sudo apt-get update -y -q
+          sudo apt-get install -y -q cloudflared
+          
+          # 4. Print Status Banner
           echo "================================================================"
           echo " SYSTEM STATUS: STEAM IS RUNNING IN BACKGROUND "
           echo " GENERATING TRYSYSTEM TUNNEL URL BELOW... "
           echo "================================================================"
           
+          # 5. Launch Link Tunnel Proxy
           cloudflared tunnel --url http://localhost:6080
